@@ -1,0 +1,95 @@
+version: "3.9"
+
+x-args: &args
+  PROJECT_NAME: ${PROJECT_NAME:-web}
+  NEXT_PUBLIC_CHAIN_TYPE: ${NEXT_PUBLIC_CHAIN_TYPE:-}
+  TURBO_TEAM: ${TURBO_TEAM:-}                         # for Turborepo remote cache
+  TURBO_TOKEN: ${TURBO_TOKEN:-}                       # for Turborepo remote cache
+  NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:-} # for Sentry.io
+  SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN:-}           # for Sentry.io
+
+x-build: &build
+  context: ./big-dipper-2.0-cosmos
+  args: *args
+  target: runner
+
+x-web: &web
+  build: *build
+  restart: always
+  platform: linux/amd64
+  ports:
+    - ${PORT:-3000}:${PORT:-3000}
+  networks:
+    - nucleus_network
+  env_file: .env
+
+services:
+  # default web
+  web: *web
+  # for mac with M1/M2 chip
+  web-arm64v8:
+    <<: *web
+    build:
+      <<: *build
+      args:
+        <<: *args
+        BASE_IMAGE: arm64v8/node:18
+
+  hasura:
+    image: hasura/graphql-engine:v2.0.4
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    restart: always
+    environment:
+      ## this env var can be used to add the above postgres database to Hasura as a data source. this can be removed/updated based on your needs
+      HASURA_GRAPHQL_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      ## enable the console served by server
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
+      ## enable debugging mode. It is recommended to disable this in production
+      HASURA_GRAPHQL_DEV_MODE: "true"
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+      ## uncomment next line to set an admin secret
+      # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+    networks:
+      - nucleus_network
+
+  callisto:
+    build:
+      context: .
+      dockerfile: callisto/Dockerfile.default
+    restart: always
+    command: callisto parse --home /callisto/.callisto
+    volumes:
+      - callisto:/callisto/.callisto
+    networks:
+      - nucleus_network
+
+
+  pgsqldb:
+    container_name: pgsqldb
+    image: postgres:12.17
+    restart: always
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./callisto/database/schema:/sql_schema
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
+    networks:
+      - nucleus_network
+
+
+volumes:
+  callisto:
+  pg_data:
+
+networks:
+  nucleus_network:

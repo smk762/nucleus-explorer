@@ -1,0 +1,6 @@
+[submodule "big-dipper-2.0-cosmos"]
+	path = big-dipper-2.0-cosmos
+	url = https://github.com/forbole/big-dipper-2.0-cosmos
+[submodule "callisto"]
+	path = callisto
+	url = https://github.com/forbole/callisto
