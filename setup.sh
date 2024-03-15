@@ -5,6 +5,9 @@ source .env
 HOST_SQL_FOLDER="callisto/database/schema"
 DOCKER_SQL_FOLDER="/sql_schema"
 
+docker compose up -d pgsqldb
+sleep 5
+
 # Iterate over each SQL file in the folder
 for sql_file in "$HOST_SQL_FOLDER"/*.sql; do
     if [ -f "$sql_file" ]; then
@@ -15,9 +18,11 @@ for sql_file in "$HOST_SQL_FOLDER"/*.sql; do
         # Check the exit status
         if [ $? -ne 0 ]; then
             echo "Error executing $fn"
+            docker-compose stop pgsqldb
             exit 1
         else
             echo "Successfully executed $fn"
         fi
     fi
 done
+docker-compose stop pgsqldb

@@ -3,4 +3,7 @@
 	url = https://github.com/forbole/big-dipper-2.0-cosmos
 [submodule "callisto"]
 	path = callisto
-	url = https://github.com/forbole/callisto
+	url = https://github.com/smk762/callisto
+[submodule "nucleus"]
+	path = nucleus
+	url = https://github.com/smk762/nucleus

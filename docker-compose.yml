@@ -18,22 +18,35 @@ x-web: &web
   restart: always
   platform: linux/amd64
   ports:
-    - ${PORT:-3000}:${PORT:-3000}
+    - ${PORT:-3033}:${PORT:-3033}
   networks:
-    - nucleus_network
+    nucleus_net:
+      ipv4_address: 10.8.8.3
   env_file: .env
 
 services:
   # default web
-  web: *web
-  # for mac with M1/M2 chip
-  web-arm64v8:
-    <<: *web
+  web: *web  
+
+  nucleus:
     build:
-      <<: *build
-      args:
-        <<: *args
-        BASE_IMAGE: arm64v8/node:18
+      context: ./nucleus
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "1317:1317" # REST API
+      - "26657:26657" # Tendermint RPC
+      - "9090:9090" # gRPC
+      - "9091:9091" # gRPC web
+    volumes:
+      - nucleus_data:/root/.nucleus
+    networks:
+      nucleus_net:
+        ipv4_address: 10.8.8.4
+    depends_on:
+      - "pgsqldb"
+      - "callisto"
+      - "hasura"
 
   hasura:
     image: hasura/graphql-engine:v2.0.4
@@ -43,53 +56,84 @@ services:
       - .env
     restart: always
     environment:
+      # See https://docs.bigdipper.live/cosmos-based/parser/hasura
+      # and https://hasura.io/docs/latest/deployment/graphql-engine-flags/reference/
+      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: "anonymous"
       ## this env var can be used to add the above postgres database to Hasura as a data source. this can be removed/updated based on your needs
-      HASURA_GRAPHQL_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      HASURA_GRAPHQL_DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@10.8.8.7:5432/${POSTGRES_DB}
       ## enable the console served by server
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true" # set to "false" to disable console
       ## enable debugging mode. It is recommended to disable this in production
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       ## uncomment next line to set an admin secret
-      # HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+      HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
+      HASURA_GRAPHQL_DISABLE_CORS: "true"
+      HASURA_GRAPHQL_WS_READ_COOKIE: "false"
+      HASURA_GRAPHQL_ENDPOINT: "http://localhost:8080/v1/graphql"
     networks:
-      - nucleus_network
+      nucleus_net:
+        ipv4_address: 10.8.8.5
+    depends_on:
+      - "pgsqldb"
 
   callisto:
     build:
-      context: .
-      dockerfile: callisto/Dockerfile.default
+      context: ./callisto
+      dockerfile: Dockerfile.default
+    env_file: .env
     restart: always
-    command: callisto parse --home /callisto/.callisto
-    volumes:
-      - callisto:/callisto/.callisto
-    networks:
-      - nucleus_network
-
-
-  pgsqldb:
-    container_name: pgsqldb
-    image: postgres:12.17
-    restart: always
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-      - ./callisto/database/schema:/sql_schema
-    env_file:
-      - .env
+    depends_on:
+      - "nucleus"
     ports:
-      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+      - "3035:3035"  # Port for Hasura actions
+      - "5000:5000"  # Telemetry, available at example.com/metrics/
+    volumes:
+      - callisto:/root/.callisto
+      - nucleus_data:/root/.nucleus
+    networks:
+      nucleus_net:
+        ipv4_address: 10.8.8.6
     logging:
       driver: "json-file"
       options:
         max-size: "20m"
         max-file: "10"
+    command: ["callisto", "start"]
+
+
+  pgsqldb:
+    container_name: pgsqldb
+    image: postgres:12.17
+    env_file: .env
+    restart: always
+    depends_on:
+      - "nucleus"
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./callisto/database/schema:/sql_schema
     networks:
-      - nucleus_network
+      nucleus_net:
+        ipv4_address: 10.8.8.7
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
 
 
 volumes:
   callisto:
+  nucleus_data:
   pg_data:
 
+
 networks:
-  nucleus_network:
+  nucleus_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.8.0.0/16
+          gateway: 10.8.8.1
