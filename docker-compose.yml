@@ -23,6 +23,10 @@ x-web: &web
     nucleus_net:
       ipv4_address: 10.8.8.3
   env_file: .env
+  depends_on:
+    - "pgsqldb"
+    - "callisto"
+    - "hasura"
 
 services:
   # default web
@@ -43,10 +47,6 @@ services:
     networks:
       nucleus_net:
         ipv4_address: 10.8.8.4
-    depends_on:
-      - "pgsqldb"
-      - "callisto"
-      - "hasura"
 
   hasura:
     image: hasura/graphql-engine:v2.0.4
@@ -76,11 +76,12 @@ services:
         ipv4_address: 10.8.8.5
     depends_on:
       - "pgsqldb"
+      - "callisto"
 
   callisto:
     build:
       context: ./callisto
-      dockerfile: Dockerfile.default
+      dockerfile: Dockerfile.explorer
     env_file: .env
     restart: always
     depends_on:
@@ -89,7 +90,7 @@ services:
       - "3035:3035"  # Port for Hasura actions
       - "5000:5000"  # Telemetry, available at example.com/metrics/
     volumes:
-      - callisto:/root/.callisto
+      - callisto:/root/.bdjuno
       - nucleus_data:/root/.nucleus
     networks:
       nucleus_net:
@@ -99,7 +100,7 @@ services:
       options:
         max-size: "20m"
         max-file: "10"
-    command: ["callisto", "start"]
+    command: ["bdjuno", "start", "--home", "/root/.bdjuno"]
 
 
   pgsqldb:
