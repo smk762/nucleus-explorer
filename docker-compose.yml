@@ -68,9 +68,10 @@ services:
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
       ## uncomment next line to set an admin secret
       HASURA_GRAPHQL_ADMIN_SECRET: myadminsecretkey
-      HASURA_GRAPHQL_DISABLE_CORS: "true"
       HASURA_GRAPHQL_WS_READ_COOKIE: "false"
       HASURA_GRAPHQL_ENDPOINT: "http://localhost:8080/v1/graphql"
+      HASURA_GRAPHQL_CORS_DOMAIN: "*"
+
     networks:
       nucleus_net:
         ipv4_address: 10.8.8.5
