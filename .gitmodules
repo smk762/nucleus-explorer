@@ -5,7 +5,7 @@
 [submodule "callisto"]
 	path = callisto
 	url = https://github.com/smk762/callisto
-	branch = nucleus
+	branch = cosmos/v0.46.x
 [submodule "nucleus"]
 	path = nucleus
 	url = https://github.com/komodoplatform/nucleus

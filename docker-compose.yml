@@ -81,7 +81,7 @@ services:
   callisto:
     build:
       context: ./callisto
-      dockerfile: Dockerfile.explorer
+      dockerfile: Dockerfile.nucleus
     env_file: .env
     restart: always
     depends_on:
