@@ -17,3 +17,7 @@ It can be ignored.
 
 - Check `http://localhost:3000` to confirm it loads, then `Ctl-C` to stop serving the front end.
 - Build the contianers for PGSql, Nucleus, Hasura, Callisto and the front end by running `docker-compose up --build` from the project root directory.
+
+
+
+- Go to http://localhost:8080/console/data/default/schema/public to access the Hasura console, then hit the `track all` button to track all tables in the database.

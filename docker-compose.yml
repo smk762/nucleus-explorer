@@ -49,9 +49,10 @@ services:
         ipv4_address: 10.8.8.4
 
   hasura:
-    image: hasura/graphql-engine:v2.0.4
+    image: hasura/graphql-engine:v2.37.0-ce
     ports:
       - "8080:8080"
+      - "3035:3035"
     env_file:
       - .env
     restart: always
@@ -88,7 +89,6 @@ services:
     depends_on:
       - "nucleus"
     ports:
-      - "3035:3035"  # Port for Hasura actions
       - "5000:5000"  # Telemetry, available at example.com/metrics/
     volumes:
       - callisto:/root/.bdjuno
