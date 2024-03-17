@@ -9,5 +9,5 @@ RUN make build
 FROM alpine:latest
 WORKDIR /bdjuno
 COPY --from=builder /callisto/build/bdjuno /usr/bin/bdjuno
-RUN bdjuno init
+COPY ./config.yaml /root/.bdjuno/config.yaml
 CMD [ "bdjuno" ]
