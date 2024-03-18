@@ -49,4 +49,4 @@ pricefeed:
               exponent: 6
               price_id: nucleus
 actions:
-    port: 3033
+    port: 3035
