@@ -72,6 +72,7 @@ services:
       HASURA_GRAPHQL_WS_READ_COOKIE: "false"
       HASURA_GRAPHQL_ENDPOINT: "http://localhost:8080/v1/graphql"
       HASURA_GRAPHQL_CORS_DOMAIN: "*"
+      ACTION_BASE_URL: "http://localhost:3035"
 
     networks:
       nucleus_net:
