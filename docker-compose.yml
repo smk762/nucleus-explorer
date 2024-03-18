@@ -32,22 +32,6 @@ services:
   # default web
   web: *web  
 
-  nucleus:
-    build:
-      context: ./nucleus
-      dockerfile: Dockerfile
-    restart: always
-    ports:
-      - "1317:1317" # REST API
-      - "26657:26657" # Tendermint RPC
-      - "9090:9090" # gRPC
-      - "9091:9091" # gRPC web
-    volumes:
-      - nucleus_data:/root/.nucleus
-    networks:
-      nucleus_net:
-        ipv4_address: 10.8.8.4
-
   hasura:
     image: hasura/graphql-engine:v2.37.0-ce
     ports:
@@ -87,8 +71,6 @@ services:
       dockerfile: Dockerfile
     env_file: .env
     restart: always
-    depends_on:
-      - "nucleus"
     ports:
       - "5000:5000"  # Telemetry, available at example.com/metrics/
     volumes:
@@ -110,8 +92,6 @@ services:
     image: postgres:12.17
     env_file: .env
     restart: always
-    depends_on:
-      - "nucleus"
     ports:
       - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
