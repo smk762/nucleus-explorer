@@ -15,6 +15,6 @@ COPY --from=builder /callisto/build/bdjuno /usr/bin/bdjuno
 RUN curl -L https://github.com/hasura/graphql-engine/raw/stable/cli/get.sh | sh
 RUN bdjuno init || true
 COPY ./config.yaml /root/.bdjuno/config.yaml
-COPY ./genesis.json /root/.bdjuno/genesis.json
+COPY ./nucleus/genesis.json /root/.bdjuno/genesis.json
 RUN bdjuno parse genesis-file --genesis-file-path /root/.bdjuno/genesis.json || true
 CMD [ "bdjuno" ]
