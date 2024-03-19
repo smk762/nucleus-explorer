@@ -2,7 +2,3 @@
 	path = big-dipper-2.0-cosmos
 	url = https://github.com/smk762/big-dipper-2.0-cosmos
 	branch = nucleus
-[submodule "nucleus"]
-	path = nucleus
-	url = https://github.com/komodoplatform/nucleus
-	branch = add-dockerfile

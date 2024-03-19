@@ -10,10 +10,10 @@ node:
     config:
         rpc:
             client_name: juno
-            address: http://127.0.0.1:26657
+            address: http://host.docker.internal:26657
             max_connections: 20
         grpc:
-            address: http://127.0.0.1:9090
+            address: http://host.docker.internal:9090
             insecure: true
 parsing:
     workers: 1
