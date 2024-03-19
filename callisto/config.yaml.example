@@ -2,18 +2,30 @@
 chain:
     bech32_prefix: nuc
     modules: 
-        - modules
-        - messages
+        - modules  # needs to be first
+        - messages  # needs to be second
         - auth
+        - bank
+        - consensus
+        - feegrant
+        - gov
+        - mint
+        - pricefeed
+        - slashing
+        - staking
+        - distribution # needs to be after staking
+        - upgrade
+        - wasm
+        - actions
 node:
     type: remote
     config:
         rpc:
             client_name: juno
-            address: http://host.docker.internal:26657
+            address: http://10.8.8.1:26657
             max_connections: 20
         grpc:
-            address: http://host.docker.internal:9090
+            address: http://10.8.8.1:9090
             insecure: true
 parsing:
     workers: 1
