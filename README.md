@@ -22,3 +22,15 @@ Run `./setup.sh` to:
 - Apply database schema to PgSQL.
 - Apply metadata to Hasura.
 - Start the containers.
+
+---
+## Notes
+
+Setting up for SSL has some potential hurdles. Here's hwo to resolve a few of them:
+
+If you encounter `ERROR: failed to start client: tls: first record does not look like a TLS handshake` or `ERROR: failed to start client: websocket: bad handshake`:
+- Make sure you have valid SSL certs defined in the `~/.nucleus/config/config.yaml` file, and are not in conflicy with nginx for the same port / cert. 
+- Regardless of SSL, in the `callisto/config.yaml` file, under node.config.rpc.address, use the `http` protocol, not `https`.
+
+
+

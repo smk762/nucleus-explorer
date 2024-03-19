@@ -34,7 +34,7 @@ parsing:
     parse_genesis: true
     start_height: 1
     fast_sync: true
-    genesis_file_path: /root/.nucleus/config/genesis.json
+    genesis_file_path: /root/.bdjuno/genesis.json
     average_block_time: 3s
 database:
     url: postgres://USERNAME:PASSWORD@10.8.8.7:5432/bdjuno?sslmode=disable
