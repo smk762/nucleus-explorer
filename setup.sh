@@ -18,7 +18,7 @@ cd -
 
 # Build and start the Docker containers
 docker compose stop
-docker compose down -v && docker-compose down -v
+docker compose down -v
 docker compose build && docker compose up -d
 
 # Apply the database schema
@@ -28,10 +28,10 @@ sleep 5
 for sql_file in "$HOST_SQL_FOLDER"/*.sql; do
     if [ -f "$sql_file" ]; then
         fn=$(basename "$sql_file")
-        docker-compose exec pgsqldb psql -U $POSTGRES_USER -d bdjuno -f "${DOCKER_SQL_FOLDER}/${fn}"
+        docker compose exec pgsqldb psql -U $POSTGRES_USER -d bdjuno -f "${DOCKER_SQL_FOLDER}/${fn}"
         if [ $? -ne 0 ]; then
             echo "Error executing $fn"
-            docker-compose stop pgsqldb
+            docker compose stop pgsqldb
             exit 1
         else
             echo "Successfully executed $fn"
