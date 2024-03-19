@@ -14,14 +14,6 @@ if [ -f "${HOME}/.nucleus/config/genesis.json" ]; then
     cp "${HOME}/.nucleus/config/genesis.json" callisto/nucleus/genesis.json
 fi
 
-# Generate front end
-cd big-dipper-2.0-cosmos
-nvm use 18
-yarn
-corepack enable
-yarn build --filter web-nucleus
-cd -
-
 # Set up the callisto config
 cp callisto/config.yaml.example callisto/config.yaml
 sed -i "s/USERNAME/$POSTGRES_USER/g" callisto/config.yaml
@@ -49,6 +41,15 @@ for sql_file in "$HOST_SQL_FOLDER"/*.sql; do
         fi
     fi
 done
+
+# Generate front end
+cd big-dipper-2.0-cosmos
+nvm use 18
+yarn run graphql:codegen
+yarn
+corepack enable
+yarn build --filter web-nucleus
+cd -
 
 # Apply Hasura metadata
 curl -L https://github.com/hasura/graphql-engine/raw/stable/cli/get.sh | bash

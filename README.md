@@ -32,5 +32,5 @@ If you encounter `ERROR: failed to start client: tls: first record does not look
 - Make sure you have valid SSL certs defined in the `~/.nucleus/config/config.yaml` file, and are not in conflicy with nginx for the same port / cert. 
 - Regardless of SSL, in the `callisto/config.yaml` file, under node.config.rpc.address, use the `http` protocol, not `https`.
 
-
+Setting up Hasura behund proxy: https://hasura.io/docs/latest/deployment/serve-behind-proxy/
 
