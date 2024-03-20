@@ -17,9 +17,11 @@ sed -i "s/PASSWORD/$POSTGRES_PASSWORD/g" callisto/config.yaml
 # Build and start the Docker containers
 docker compose stop
 docker-compose down -v
-docker compose build && docker compose up -d
+
+docker compose up -d pgsqldb
 
 # Apply the database schema
+
 HOST_SQL_FOLDER="callisto/database/schema"
 DOCKER_SQL_FOLDER="/sql_schema"
 sleep 5
@@ -43,7 +45,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-cd big-dipper-2.0-cosmos
+cd big-dipper-2.0-cosmos/apps/web-nucleus
 # Generate front end
 nvm use 18
 yarn
@@ -57,6 +59,9 @@ curl -L https://github.com/hasura/graphql-engine/raw/stable/cli/get.sh | bash
 cd callisto/hasura
 hasura metadata apply --endpoint http://localhost:8080 --admin-secret ${HASURA_GRAPHQL_ADMIN_SECRET}
 cd -
+
+
+docker compose build && docker compose up -d
 
 echo "Use the following command to follow the container logs:"
 echo "docker compose logs -f -n 10"
