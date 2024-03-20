@@ -1,4 +1,4 @@
 [submodule "big-dipper-2.0-cosmos"]
 	path = big-dipper-2.0-cosmos
 	url = https://github.com/smk762/big-dipper-2.0-cosmos
-	branch = nucleus
+	branch = chains/nucleus
