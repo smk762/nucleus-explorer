@@ -1,13 +1,8 @@
 #!/bin/bash
 
 # Get Environment Variables
+
 source .env
-
-# Setup for nvm
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
 # Get local genesis file if existing
 if [ -f "${HOME}/.nucleus/config/genesis.json" ]; then
     echo "Genesis file already exists"
@@ -42,11 +37,17 @@ for sql_file in "$HOST_SQL_FOLDER"/*.sql; do
     fi
 done
 
-# Generate front end
+
+# Setup for nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
 cd big-dipper-2.0-cosmos
+# Generate front end
 nvm use 18
-yarn run graphql:codegen
 yarn
+yarn run graphql:codegen
 corepack enable
 yarn build --filter web-nucleus
 cd -
